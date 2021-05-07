@@ -140,7 +140,7 @@ class Deposit extends React.Component {
   async loadTokenData(address) {
     const { api, network, connectedAccount } = this.props
 
-    // ETH
+    // CFX
     if (addressesEqual(address, ETHER_TOKEN_FAKE_ADDRESS)) {
       const userBalance = await api
         .web3Eth('getBalance', connectedAccount)
