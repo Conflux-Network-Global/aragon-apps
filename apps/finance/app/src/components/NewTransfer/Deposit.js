@@ -1,4 +1,4 @@
-import { useNetwork, useAragonApi } from '@aragon/api-react'
+import { useAragonApi } from '@aragon/api-react'
 import React from 'react'
 import styled from 'styled-components'
 import BN from 'bn.js'
@@ -65,12 +65,14 @@ class Deposit extends React.Component {
   state = {
     ...initialState,
   }
+
   componentWillReceiveProps({ opened }) {
     if (!opened && this.props.opened) {
       // Panel closing; reset state
       this.setState({ ...initialState })
     }
   }
+
   handleAmountUpdate = event => {
     this.validateInputs({
       amount: {
@@ -78,12 +80,14 @@ class Deposit extends React.Component {
       },
     })
   }
+
   handleSelectToken = ({ address, index, value }) => {
-    const tokenIsAddress = isAddress(address)
+    const hexAddress = address ? format.hexAddress(address) : ''
+    const tokenIsAddress = isAddress(hexAddress)
     const selectedToken = {
       index,
-      coerced: tokenIsAddress && address !== value,
-      value: address,
+      coerced: tokenIsAddress && hexAddress !== value,
+      value: hexAddress,
       data: { loading: true },
     }
 
@@ -102,11 +106,11 @@ class Deposit extends React.Component {
 
     // Set the initial loading state before we go async
     this.setState({ selectedToken }, async () => {
-      const tokenData = await this.loadTokenData(address)
+      const tokenData = await this.loadTokenData(hexAddress)
 
       // Make sure we still want the information about this token after the async call,
       // in case the token was changed before this finished loading
-      if (this.state.selectedToken.value === address) {
+      if (this.state.selectedToken.value === hexAddress) {
         this.validateInputs({
           selectedToken: {
             ...this.state.selectedToken,
@@ -135,10 +139,12 @@ class Deposit extends React.Component {
       onDeposit(selectedToken.value, adjustedAmount, reference)
     }
   }
+
   canSubmit() {
     const { selectedToken } = this.state
     return selectedToken.value && !selectedToken.data.loading
   }
+
   async loadTokenData(address) {
     const { api, network, connectedAccount } = this.props
 
@@ -191,6 +197,7 @@ class Deposit extends React.Component {
       symbol: tokenSymbol,
     }
   }
+
   validateInputs({ amount, selectedToken } = {}) {
     if (
       selectedToken &&
@@ -251,6 +258,7 @@ class Deposit extends React.Component {
     })
     return true
   }
+
   setMaxUserBalance = () => {
     const { selectedToken, amount } = this.state
     const { userBalance, decimals } = selectedToken.data
@@ -354,6 +362,7 @@ class Deposit extends React.Component {
               <VSpace size={1} />
               <IdentityBadge
                 entity={cfxFormmattedAppAddress}
+                chainId={networkId}
                 labelStyle={`
                   ${textStyle('body3')}
                 `}
@@ -424,6 +433,7 @@ const SelectedTokenBalance = ({ network, selectedToken }) => {
             >
               <TokenBadge
                 address={address}
+                chainId={network.id}
                 symbol={symbol}
                 networkType={network.type}
               />
