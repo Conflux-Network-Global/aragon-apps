@@ -262,7 +262,7 @@ class Deposit extends React.Component {
 
   render() {
     const { appAddress, network, title, tokens } = this.props
-    const networkId = network.id || '1' // default to testnet
+    const networkId = network.id || 1 // default to testnet
     const cfxFormmattedAppAddress = format.address(appAddress, networkId)
     const { amount, reference, selectedToken } = this.state
     let errorMessage
