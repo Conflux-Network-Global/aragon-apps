@@ -1,3 +1,4 @@
+import { useNetwork, useAragonApi } from '@aragon/api-react'
 import React from 'react'
 import styled from 'styled-components'
 import BN from 'bn.js'
@@ -14,7 +15,8 @@ import {
   textStyle,
   useTheme,
 } from '@conflux-/aragon-ui'
-import { useAragonApi } from '@aragon/api-react'
+import { format } from 'js-conflux-sdk'
+
 import QRCode from 'qrcode.react'
 import tokenBalanceOfAbi from '../../abi/token-balanceof.json'
 import tokenDecimalsAbi from '../../abi/token-decimals.json'
@@ -257,8 +259,11 @@ class Deposit extends React.Component {
       amount: { ...amount, value: adjustedAmount },
     })
   }
+
   render() {
     const { appAddress, network, title, tokens } = this.props
+    const networkId = network.id || process.env.NETWORK_ID || '1' // default to testnet
+    const cfxFormmattedAppAddress = format.address(appAddress, networkId)
     const { amount, reference, selectedToken } = this.state
     let errorMessage
     if (selectedToken.error === TOKEN_NOT_FOUND_ERROR) {
@@ -337,18 +342,18 @@ class Deposit extends React.Component {
           )}
         </Info>
 
-        {appAddress && ethSelected && (
+        {cfxFormmattedAppAddress && ethSelected && (
           <div>
             <VSpace size={3} />
             <ToggleContent label="Show address for direct CFX transfer ">
               <VSpace size={2} />
               <QRCode
-                value={appAddress}
+                value={cfxFormmattedAppAddress}
                 style={{ width: '80px', height: '80px' }}
               />
               <VSpace size={1} />
               <IdentityBadge
-                entity={appAddress}
+                entity={cfxFormmattedAppAddress}
                 labelStyle={`
                   ${textStyle('body3')}
                 `}
